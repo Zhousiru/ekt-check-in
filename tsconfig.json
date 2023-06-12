@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ekt-check-in/*": ["packages/*/src"],
+      "@ekt-check-in/types/*": ["packages/types/src/*"]
+    }
+  }
+}
