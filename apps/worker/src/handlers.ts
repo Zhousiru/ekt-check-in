@@ -15,7 +15,7 @@ const handleRequestActivities: ServerToClientEvents["requestActivities"] =
     let apiToken: string | null = null;
 
     for (let count = 1; count <= 5; count++) {
-      const res = await client.post("//ekt.cuit.edu.cn/api/login", {
+      const res = await client.post("http://ekt.cuit.edu.cn/api/login", {
         account: randomAccount(),
         password: "123456",
       });
@@ -31,13 +31,16 @@ const handleRequestActivities: ServerToClientEvents["requestActivities"] =
       return;
     }
 
-    const res = await client.get("//ekt.cuit.edu.cn/api/activityInfo/page", {
-      params: {
-        pageSize,
-        pageNo,
-      },
-      headers: { Authorization: `Bearer ${apiToken}` },
-    });
+    const res = await client.get(
+      "http://ekt.cuit.edu.cn/api/activityInfo/page",
+      {
+        params: {
+          pageSize,
+          pageNo,
+        },
+        headers: { Authorization: `Bearer ${apiToken}` },
+      }
+    );
 
     callback(res.data);
   };

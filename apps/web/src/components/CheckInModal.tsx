@@ -79,8 +79,8 @@ export function CheckInModal({
                     ml={1}
                     href={
                       noVpn
-                        ? "//ekt.cuit.edu.cn/api/mSsoLogin"
-                        : "//ekt-cuit-edu-cn.webvpn.cuit.edu.cn:8118/api/mSsoLogin"
+                        ? "http://ekt.cuit.edu.cn/api/mSsoLogin"
+                        : "http://ekt-cuit-edu-cn.webvpn.cuit.edu.cn:8118/api/mSsoLogin"
                     }
                     color="teal"
                     isExternal
