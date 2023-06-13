@@ -1,5 +1,6 @@
 {
   "name": "@ekt-check-in/config",
   "version": "1.0.0",
-  "description": ""
+  "description": "",
+  "main": "src/index.ts"
 }

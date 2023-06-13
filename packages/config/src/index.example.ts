@@ -3,4 +3,7 @@ import { Config } from "@ekt-check-in/types/config";
 // @ts-ignore
 const config: Config = {};
 
-export { config };
+// @ts-ignore
+const webConfig: WebConfig = {};
+
+export { config, webConfig };

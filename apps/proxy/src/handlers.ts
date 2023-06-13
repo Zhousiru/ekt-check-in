@@ -6,7 +6,7 @@ import { getWebsocketServer } from "./websocket";
 export async function handleRequestActivities(req: Request, res: Response) {
   const server = getWebsocketServer();
   if (server.engine.clientsCount === 0) {
-    const r: ProxyApiResponse = {
+    const r: ProxyApiResponse<null> = {
       payload: null,
       msg: "no workers online",
     };
@@ -52,13 +52,13 @@ export async function handleRequestActivities(req: Request, res: Response) {
       };
     });
 
-    const r: ProxyApiResponse = {
+    const r: ProxyApiResponse<Activity[]> = {
       payload: activities,
       msg: "",
     };
     res.status(200).json(r);
   } catch (err) {
-    const r: ProxyApiResponse = {
+    const r: ProxyApiResponse<null> = {
       payload: null,
       msg: "failed to get response from workers",
     };

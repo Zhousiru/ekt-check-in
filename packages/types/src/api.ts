@@ -1,26 +1,7 @@
-import { EktActivityRow } from "./ekt";
-
-export interface ProxyApiResponse {
-  payload: any;
+export interface ProxyApiResponse<T> {
+  payload: T;
   msg: string;
 }
-
-export type FilteredActivityA = Pick<
-  EktActivityRow,
-  | "createTime"
-  | "id"
-  | "activityName"
-  | "activityIntegral"
-  | "activityHost"
-  | "startTime"
-  | "endTime"
-  | "activityAddress"
-  | "activityDec"
-  | "signTime"
-  | "activityNum"
-  | "signNum"
-  | "activityStatus"
->;
 
 export interface Activity {
   id: string;
