@@ -1,4 +1,4 @@
-import { ActivityRow, ApiResponse } from "@ekt-check-in/types/ekt";
+import { EktActivityRow, EktApiResponse } from "@ekt-check-in/types/ekt";
 import { ServerToClientEvents } from "@ekt-check-in/types/websocket";
 import client from "./client";
 import { randomAccount } from "./utils";
@@ -6,7 +6,10 @@ import { randomAccount } from "./utils";
 const handleRequestActivities: ServerToClientEvents["requestActivities"] =
   async (
     pageSize: number,
-    callback: (response: ApiResponse<ActivityRow> | null, err?: Error) => void,
+    callback: (
+      response: EktApiResponse<EktActivityRow> | null,
+      err?: Error
+    ) => void,
     pageNo?: number
   ) => {
     let apiToken: string | null = null;

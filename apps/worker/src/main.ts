@@ -13,6 +13,10 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
   }
 );
 
+socket.io.on("open", () => {
+  console.log(`Successfully connected to proxy server`);
+});
+
 socket.on("connect_error", (err) => {
   console.log(`Failed to connect to proxy server: ${err.message}`);
 });

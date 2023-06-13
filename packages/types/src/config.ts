@@ -1,6 +1,7 @@
 export interface Config {
   proxy: {
-    port: number;
+    websocketPort: number;
+    apiPort: number;
     token: string;
   };
   worker: {

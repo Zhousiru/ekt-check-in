@@ -1,9 +1,12 @@
-import { ActivityRow, ApiResponse } from "./ekt";
+import { EktActivityRow, EktApiResponse } from "./ekt";
 
 export interface ServerToClientEvents {
   requestActivities: (
     pageSize: number,
-    callback: (response: ApiResponse<ActivityRow> | null, err?: Error) => void,
+    callback: (
+      response: EktApiResponse<EktActivityRow> | null,
+      err?: Error
+    ) => void,
     pageNo?: number
   ) => void;
 }
