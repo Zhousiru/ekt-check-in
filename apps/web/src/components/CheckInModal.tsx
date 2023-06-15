@@ -124,7 +124,7 @@ export function CheckInModal({
 
             <InputGroup>
               <Input
-                pr="4.5rem"
+                pr="4rem"
                 placeholder="Enter password"
                 readOnly={true}
                 value={link}
