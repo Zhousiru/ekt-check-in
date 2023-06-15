@@ -38,16 +38,21 @@ export function CheckInModal({
   const [isInActivity, setIsInActivity] = useState<boolean>(false);
 
   useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
     const nowTimestamp = new Date().getTime();
     const linkTimestamp = nowTimestamp + 7200000;
     if (noVpn) {
       setLink(
         `http://ekty.cuit.edu.cn/#/pages/activity/studentQdqt?id=${activityData.id}&timestamp=${linkTimestamp}`
       );
+    } else {
+      setLink(
+        `http://ekty-cuit-edu-cn.webvpn.cuit.edu.cn:8118/#/pages/activity/studentQdqt?id=${activityData.id}&timestamp=${linkTimestamp}`
+      );
     }
-    setLink(
-      `http://ekty-cuit-edu-cn.webvpn.cuit.edu.cn:8118/#/pages/activity/studentQdqt?id=${activityData.id}&timestamp=${linkTimestamp}`
-    );
 
     const startTimestamp = new Date(activityData.startTime).getTime();
     const endTimestamp = new Date(activityData.endTime).getTime();
@@ -58,11 +63,11 @@ export function CheckInModal({
       setIsInActivity(false);
     }
   }, [
-    activityData.id,
-    noVpn,
-    isOpen,
-    activityData.startTime,
     activityData.endTime,
+    activityData.id,
+    activityData.startTime,
+    isOpen,
+    noVpn,
   ]);
 
   return (
@@ -77,12 +82,12 @@ export function CheckInModal({
             {isInActivity ? (
               <Alert status="success">
                 <AlertIcon />
-                当前处于活动时间内
+                当前为活动时间，请检查活动时间是否属实
               </Alert>
             ) : (
               <Alert status={isInActivity ? "success" : "warning"}>
                 <AlertIcon />
-                当前非活动时间，签到记录可能无法通过审核
+                当前非活动时间，签到可能无法通过审核
               </Alert>
             )}
 
@@ -93,7 +98,7 @@ export function CheckInModal({
 
             <Checkbox
               colorScheme="teal"
-              checked={noVpn}
+              isChecked={noVpn}
               onChange={() => setNoVpn((prev) => !prev)}
             >
               我可以访问 <Code>ekt.cuit.edu.cn</Code>
@@ -128,6 +133,7 @@ export function CheckInModal({
                 placeholder="Enter password"
                 readOnly={true}
                 value={link}
+                onFocus={(e) => e.target.select()}
               />
               <InputRightElement width="4rem">
                 <Button

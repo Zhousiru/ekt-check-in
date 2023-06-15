@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       <Container
-        maxW={1200}
+        maxW={1000}
         display="flex"
         flexDirection="column"
         py="10vh"
