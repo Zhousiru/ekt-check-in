@@ -1,10 +1,7 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Alert,
-  AlertDescription,
   AlertIcon,
-  AlertTitle,
-  Box,
   Button,
   Checkbox,
   Code,
@@ -24,25 +21,49 @@ import {
   OrderedList,
   Text,
 } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+import { Activity } from "@ekt-check-in/types/api";
+import { useEffect, useState } from "react";
 
 export function CheckInModal({
-  id,
+  activityData,
   isOpen,
   onClose,
 }: {
-  id: string;
+  activityData: Activity;
   isOpen: boolean;
   onClose: () => void;
 }) {
   const [noVpn, setNoVpn] = useState<boolean>(false);
-  const link = useMemo(() => {
-    const timestamp = new Date().getTime() + 7200000;
+  const [link, setLink] = useState<string>("");
+  const [isInActivity, setIsInActivity] = useState<boolean>(false);
+
+  useEffect(() => {
+    const nowTimestamp = new Date().getTime();
+    const linkTimestamp = nowTimestamp + 7200000;
     if (noVpn) {
-      return `http://ekty.cuit.edu.cn/#/pages/activity/studentQdqt?id=${id}&timestamp=${timestamp}`;
+      setLink(
+        `http://ekty.cuit.edu.cn/#/pages/activity/studentQdqt?id=${activityData.id}&timestamp=${linkTimestamp}`
+      );
     }
-    return `http://ekty-cuit-edu-cn.webvpn.cuit.edu.cn:8118/#/pages/activity/studentQdqt?id=${id}&timestamp=${timestamp}`;
-  }, [id, noVpn]);
+    setLink(
+      `http://ekty-cuit-edu-cn.webvpn.cuit.edu.cn:8118/#/pages/activity/studentQdqt?id=${activityData.id}&timestamp=${linkTimestamp}`
+    );
+
+    const startTimestamp = new Date(activityData.startTime).getTime();
+    const endTimestamp = new Date(activityData.endTime).getTime();
+
+    if (nowTimestamp >= startTimestamp && nowTimestamp <= endTimestamp) {
+      setIsInActivity(true);
+    } else {
+      setIsInActivity(false);
+    }
+  }, [
+    activityData.id,
+    noVpn,
+    isOpen,
+    activityData.startTime,
+    activityData.endTime,
+  ]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -53,14 +74,21 @@ export function CheckInModal({
 
         <ModalBody>
           <Flex gap={4} direction="column">
+            {isInActivity ? (
+              <Alert status="success">
+                <AlertIcon />
+                当前处于活动时间内
+              </Alert>
+            ) : (
+              <Alert status={isInActivity ? "success" : "warning"}>
+                <AlertIcon />
+                当前非活动时间，签到记录可能无法通过审核
+              </Alert>
+            )}
+
             <Alert status="info">
               <AlertIcon />
-              <Box>
-                <AlertTitle>提示</AlertTitle>
-                <AlertDescription>
-                  签退按钮在签到按钮的下方，与背景色相同
-                </AlertDescription>
-              </Box>
+              签退按钮在签到按钮的下方，与背景色相同
             </Alert>
 
             <Checkbox

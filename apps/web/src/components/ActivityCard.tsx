@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertIcon,
   Badge,
   Button,
   Card,
@@ -14,7 +16,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { Activity } from "@ekt-check-in/types/api";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CheckInModal } from "./CheckInModal";
 
 function StatusBadge({ status }: { status: number }) {
@@ -38,6 +40,9 @@ function StatusBadge({ status }: { status: number }) {
 export function ActivityCard({ activityData }: { activityData: Activity }) {
   const [showDesc, setShowDesc] = useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const isWrongId = useMemo(() => {
+    return !/^\d+$/.test(activityData.id);
+  }, [activityData.id]);
 
   return (
     <>
@@ -52,7 +57,7 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
                 <StatusBadge status={activityData.status} />
                 <Badge colorScheme="teal">{activityData.point} 分</Badge>
                 <Badge colorScheme="cyan">
-                  {activityData.regNum} / {activityData.maxRegNum ?? "∞"}
+                  {activityData.regNum} / {activityData.maxRegNum ?? "∞"} 人
                 </Badge>
               </Flex>
               <Text color="GrayText" fontSize="sm">
@@ -75,14 +80,26 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
         </CardBody>
 
         <Collapse in={showDesc}>
-          <CardBody bg="blackAlpha.50">
+          <CardBody bg="blackAlpha.50" mb={5}>
             <Text whiteSpace="pre-wrap">{`${activityData.desc}`}</Text>
           </CardBody>
         </Collapse>
 
-        <CardBody>
+        <CardBody pt={0}>
+          {isWrongId && (
+            <Alert status="error" mb={5}>
+              <AlertIcon />
+              无法为此活动提供签到功能，因为第二课堂 API 返回的 ID 有误
+            </Alert>
+          )}
+
           <Flex gap={2}>
-            <Button size="sm" colorScheme="teal" onClick={onOpen}>
+            <Button
+              size="sm"
+              colorScheme="teal"
+              onClick={onOpen}
+              isDisabled={isWrongId}
+            >
               签到
             </Button>
             <Button
@@ -96,7 +113,11 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
         </CardBody>
       </Card>
 
-      <CheckInModal id={activityData.id} isOpen={isOpen} onClose={onClose} />
+      <CheckInModal
+        activityData={activityData}
+        isOpen={isOpen}
+        onClose={onClose}
+      />
     </>
   );
 }
