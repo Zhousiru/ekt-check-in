@@ -52,7 +52,7 @@ const handleRequestActivities: ServerToClientEvents["requestActivities"] =
     callback(res.data);
   };
 
-const handleRegisterActivity: ServerToClientEvents["registerActivity"] = (
+const handleRegisterActivity: ServerToClientEvents["registerActivity"] = async (
   id: string,
   password: string,
   activityId: string,
@@ -61,7 +61,31 @@ const handleRegisterActivity: ServerToClientEvents["registerActivity"] = (
     err?: string
   ) => void
 ) => {
-  // TODO
+  try {
+    const apiToken = await loginAccount(id, password);
+
+    const res = await client.post<EktApiResponse<EktRegisterActivityData>>(
+      "http://ekt.cuit.edu.cn/api/activityInfoSign/add",
+      {
+        activityId: activityId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+        },
+      }
+    );
+
+    if (!res.data.success || res.data.data.code != "1") {
+      throw new Error(`failed to register activity: ${res.data.data.msg}`);
+    }
+
+    callback(res.data);
+  } catch (error) {
+    if (error instanceof Error) {
+      callback(null, error.message);
+    }
+  }
 };
 
-export { handleRequestActivities };
+export { handleRegisterActivity, handleRequestActivities };

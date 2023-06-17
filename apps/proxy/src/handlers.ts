@@ -3,29 +3,22 @@ import {
   EktActivityData,
   EktActivityRow,
   EktApiResponse,
+  EktRegisterActivityData,
 } from "@ekt-check-in/types/ekt";
 import { Request, Response } from "express";
-import { getWebsocketServer } from "./websocket";
+import { getWorkerWithResponse, responseWithWorkerError } from "./utils";
 
 export async function handleRequestActivities(req: Request, res: Response) {
-  const server = getWebsocketServer();
-  if (server.engine.clientsCount === 0) {
-    const r: ProxyApiResponse<null> = {
-      payload: null,
-      msg: "no workers online",
-    };
-    res.status(500).json(r);
+  const worker = await getWorkerWithResponse(res);
+  if (!worker) {
     return;
   }
-
-  const sockets = await server.fetchSockets();
-  const selectedSocket = sockets[Math.floor(Math.random() * sockets.length)];
 
   try {
     const apiRes = await new Promise<
       EktApiResponse<EktActivityData<EktActivityRow>>
     >((resolve, reject) => {
-      selectedSocket.emit(
+      worker.emit(
         "requestActivities",
         50,
         (
@@ -65,19 +58,59 @@ export async function handleRequestActivities(req: Request, res: Response) {
     };
     res.status(200).json(r);
   } catch (err) {
-    let r: ProxyApiResponse<null> = {
-      payload: null,
-      msg: "failed to get response from workers",
-    };
+    responseWithWorkerError(res, err);
+    return;
+  }
+}
 
-    if (typeof err === "string") {
-      r = {
+export async function handleRegisterActivity(req: Request, res: Response) {
+  const worker = await getWorkerWithResponse(res);
+  if (!worker) {
+    return;
+  }
+
+  const { id, password, activityId } = req.query;
+
+  for (const qs of [id, password, activityId]) {
+    if (typeof qs !== "string") {
+      const r: ProxyApiResponse<null> = {
         payload: null,
-        msg: `failed to get response from workers: ${err}`,
+        msg: `invalid query params`,
       };
+      res.status(400).json(r);
+      return;
     }
+  }
 
-    res.status(500).json(r);
+  try {
+    const apiRes = await new Promise<EktApiResponse<EktRegisterActivityData>>(
+      (resolve, reject) => {
+        worker.emit(
+          "registerActivity",
+          <string>id,
+          <string>password,
+          <string>activityId,
+          (
+            response: EktApiResponse<EktRegisterActivityData> | null,
+            err?: string
+          ) => {
+            if (err || !response) {
+              reject(err);
+              return;
+            }
+            resolve(response);
+          }
+        );
+      }
+    );
+
+    const r: ProxyApiResponse<null> = {
+      payload: null,
+      msg: `successfully registered: ${apiRes.data.msg}`,
+    };
+    res.status(200).json(r);
+  } catch (err) {
+    responseWithWorkerError(res, err);
     return;
   }
 }

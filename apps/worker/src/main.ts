@@ -4,7 +4,7 @@ import {
   ServerToClientEvents,
 } from "@ekt-check-in/types/websocket";
 import { Socket, io } from "socket.io-client";
-import { handleRequestActivities } from "./handlers";
+import { handleRegisterActivity, handleRequestActivities } from "./handlers";
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
   config.worker.proxyAddress,
@@ -22,3 +22,4 @@ socket.on("connect_error", (err) => {
 });
 
 socket.on("requestActivities", handleRequestActivities);
+socket.on("registerActivity", handleRegisterActivity);
