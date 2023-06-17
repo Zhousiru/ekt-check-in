@@ -1,5 +1,9 @@
 import { Activity, ProxyApiResponse } from "@ekt-check-in/types/api";
-import { EktActivityRow, EktApiResponse } from "@ekt-check-in/types/ekt";
+import {
+  EktActivityData,
+  EktActivityRow,
+  EktApiResponse,
+} from "@ekt-check-in/types/ekt";
 import { Request, Response } from "express";
 import { getWebsocketServer } from "./websocket";
 
@@ -18,21 +22,24 @@ export async function handleRequestActivities(req: Request, res: Response) {
   const selectedSocket = sockets[Math.floor(Math.random() * sockets.length)];
 
   try {
-    const apiRes = await new Promise<EktApiResponse<EktActivityRow>>(
-      (resolve, reject) => {
-        selectedSocket.emit(
-          "requestActivities",
-          50,
-          (response: EktApiResponse<EktActivityRow> | null, err?: Error) => {
-            if (err || !response) {
-              reject(err);
-              return;
-            }
-            resolve(response);
+    const apiRes = await new Promise<
+      EktApiResponse<EktActivityData<EktActivityRow>>
+    >((resolve, reject) => {
+      selectedSocket.emit(
+        "requestActivities",
+        50,
+        (
+          response: EktApiResponse<EktActivityData<EktActivityRow>> | null,
+          err?: Error
+        ) => {
+          if (err || !response) {
+            reject(err);
+            return;
           }
-        );
-      }
-    );
+          resolve(response);
+        }
+      );
+    });
 
     const activities = apiRes.data.rows.map((row): Activity => {
       return {

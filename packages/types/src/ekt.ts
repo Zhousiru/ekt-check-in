@@ -2,14 +2,21 @@ export interface EktApiResponse<T> {
   success: boolean;
   code: number;
   message: string;
-  data: {
-    pageNo: number;
-    pageSize: number;
-    totalPage: number;
-    totalRows: number;
-    rows: T[];
-    rainbow: number[];
-  };
+  data: T;
+}
+
+export interface EktRegisterActivityData {
+  msg: string;
+  code: string;
+}
+
+export interface EktActivityData<T> {
+  pageNo: number;
+  pageSize: number;
+  totalPage: number;
+  totalRows: number;
+  rows: T[];
+  rainbow: number[];
 }
 
 export interface EktActivityRow {

@@ -1,4 +1,8 @@
-import { EktActivityRow, EktApiResponse } from "@ekt-check-in/types/ekt";
+import {
+  EktActivityData,
+  EktActivityRow,
+  EktApiResponse,
+} from "@ekt-check-in/types/ekt";
 import { ServerToClientEvents } from "@ekt-check-in/types/websocket";
 import client from "./client";
 import { randomAccount } from "./utils";
@@ -7,7 +11,7 @@ const handleRequestActivities: ServerToClientEvents["requestActivities"] =
   async (
     pageSize: number,
     callback: (
-      response: EktApiResponse<EktActivityRow> | null,
+      response: EktApiResponse<EktActivityData<EktActivityRow>> | null,
       err?: Error
     ) => void,
     pageNo?: number
