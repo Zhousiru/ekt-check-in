@@ -18,6 +18,7 @@ import {
 import { Activity } from "@ekt-check-in/types/api";
 import { useMemo, useState } from "react";
 import { CheckInModal } from "./CheckInModal";
+import { RegisterModal } from "./RegisterModal";
 
 function StatusBadge({ status }: { status: number }) {
   const text = ["报名中", "待开始", "进行中", "待完结", "完结审核中", "已完结"];
@@ -39,7 +40,19 @@ function StatusBadge({ status }: { status: number }) {
 
 export function ActivityCard({ activityData }: { activityData: Activity }) {
   const [showDesc, setShowDesc] = useState<boolean>(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const {
+    isOpen: isCheckInOpen,
+    onOpen: onCheckInOpen,
+    onClose: onCheckInClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isRegisterOpen,
+    onOpen: onRegisterOpen,
+    onClose: onRegisterClose,
+  } = useDisclosure();
+
   const isWrongId = useMemo(() => {
     return !/^\d+$/.test(activityData.id);
   }, [activityData.id]);
@@ -89,7 +102,7 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
           {isWrongId && (
             <Alert status="error" mb={5}>
               <AlertIcon />
-              无法为此活动提供签到功能，因为第二课堂 API 返回的 ID 有误
+              此活动部分功能不可用，因为第二课堂 API 返回的 ID 有误
             </Alert>
           )}
 
@@ -97,10 +110,19 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
             <Button
               size="sm"
               colorScheme="teal"
-              onClick={onOpen}
+              onClick={onCheckInOpen}
               isDisabled={isWrongId}
             >
               签到
+            </Button>
+            <Button
+              size="sm"
+              colorScheme="teal"
+              variant="outline"
+              onClick={onRegisterOpen}
+              isDisabled={isWrongId}
+            >
+              帮我报名
             </Button>
             <Button
               size="sm"
@@ -115,8 +137,14 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
 
       <CheckInModal
         activityData={activityData}
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={isCheckInOpen}
+        onClose={onCheckInClose}
+      />
+
+      <RegisterModal
+        activityData={activityData}
+        isOpen={isRegisterOpen}
+        onClose={onRegisterClose}
       />
     </>
   );

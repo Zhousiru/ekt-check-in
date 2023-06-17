@@ -99,7 +99,7 @@ export function CheckInModal({
             <Checkbox
               colorScheme="teal"
               isChecked={noVpn}
-              onChange={() => setNoVpn((prev) => !prev)}
+              onChange={(e) => setNoVpn(e.target.checked)}
             >
               我可以访问 <Code>ekt.cuit.edu.cn</Code>
             </Checkbox>
