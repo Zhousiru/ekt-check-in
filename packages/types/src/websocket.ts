@@ -10,16 +10,17 @@ export interface ServerToClientEvents {
     pageSize: number,
     callback: (
       response: EktApiResponse<EktActivityData<EktActivityRow>> | null,
-      err?: Error
+      err?: string
     ) => void,
     pageNo?: number
   ) => void;
   registerActivity: (
     id: string,
+    password: string,
     activityId: string,
     callback: (
       response: EktApiResponse<EktRegisterActivityData> | null,
-      err?: Error
+      err?: string
     ) => void
   ) => void;
 }

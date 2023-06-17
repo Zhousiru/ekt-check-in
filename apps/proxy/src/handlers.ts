@@ -30,7 +30,7 @@ export async function handleRequestActivities(req: Request, res: Response) {
         50,
         (
           response: EktApiResponse<EktActivityData<EktActivityRow>> | null,
-          err?: Error
+          err?: string
         ) => {
           if (err || !response) {
             reject(err);
@@ -65,10 +65,18 @@ export async function handleRequestActivities(req: Request, res: Response) {
     };
     res.status(200).json(r);
   } catch (err) {
-    const r: ProxyApiResponse<null> = {
+    let r: ProxyApiResponse<null> = {
       payload: null,
       msg: "failed to get response from workers",
     };
+
+    if (typeof err === "string") {
+      r = {
+        payload: null,
+        msg: `failed to get response from workers: ${err}`,
+      };
+    }
+
     res.status(500).json(r);
     return;
   }
