@@ -57,6 +57,13 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
     return !/^\d+$/.test(activityData.id);
   }, [activityData.id]);
 
+  const isRegistrable = useMemo(() => {
+    if (activityData.maxRegNum) {
+      return activityData.regNum < activityData.maxRegNum;
+    }
+    return true;
+  }, [activityData.maxRegNum, activityData.regNum]);
+
   return (
     <>
       <Card>
@@ -102,7 +109,7 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
           {isWrongId && (
             <Alert status="error" mb={5}>
               <AlertIcon />
-              此活动部分功能不可用，因为第二课堂 API 返回的 ID 有误
+              此活动功能不可用，因为第二课堂 API 返回的 ID 有误
             </Alert>
           )}
 
@@ -120,7 +127,7 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
               colorScheme="teal"
               variant="outline"
               onClick={onRegisterOpen}
-              isDisabled={isWrongId}
+              isDisabled={isWrongId || !isRegistrable}
             >
               帮我报名
             </Button>

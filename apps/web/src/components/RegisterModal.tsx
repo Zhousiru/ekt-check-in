@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertIcon,
   Button,
   Checkbox,
   Flex,
@@ -92,6 +94,13 @@ export function RegisterModal({
 
         <ModalBody>
           <Flex gap={4} direction="column">
+            {activityData.status !== 0 && (
+              <Alert status="warning">
+                <AlertIcon />
+                当前非报名时间，报名可能无法通过审核
+              </Alert>
+            )}
+
             <FormControl isRequired>
               <FormLabel>账号</FormLabel>
               <Input

@@ -85,7 +85,7 @@ export function CheckInModal({
                 当前为活动时间，请检查活动时间是否属实
               </Alert>
             ) : (
-              <Alert status={isInActivity ? "success" : "warning"}>
+              <Alert status="warning">
                 <AlertIcon />
                 当前非活动时间，签到可能无法通过审核
               </Alert>
