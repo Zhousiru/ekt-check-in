@@ -24,7 +24,7 @@ import {
 import { Activity } from "@ekt-check-in/types/api";
 import { useEffect, useState } from "react";
 
-export function CheckInModal({
+export function CheckInLinkModal({
   activityData,
   isOpen,
   onClose,
@@ -74,7 +74,7 @@ export function CheckInModal({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>签到</ModalHeader>
+        <ModalHeader>签到链接</ModalHeader>
         <ModalCloseButton />
 
         <ModalBody>

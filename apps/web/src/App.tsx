@@ -1,5 +1,7 @@
 import { Card, CardBody, Container, Heading } from "@chakra-ui/react";
+import { AccountProvider } from "./components/AccountProvider";
 import { ActivityList } from "./components/ActivityList";
+import { SettingCard } from "./components/SettingCard";
 
 function App() {
   return (
@@ -19,7 +21,10 @@ function App() {
           </CardBody>
         </Card>
 
-        <ActivityList />
+        <AccountProvider>
+          <SettingCard />
+          <ActivityList />
+        </AccountProvider>
       </Container>
     </>
   );

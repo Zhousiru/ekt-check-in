@@ -14,11 +14,13 @@ import {
   Text,
   UnorderedList,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { Activity } from "@ekt-check-in/types/api";
-import { useMemo, useState } from "react";
-import { CheckInModal } from "./CheckInModal";
-import { RegisterModal } from "./RegisterModal";
+import { webConfig } from "@ekt-check-in/config";
+import { Activity, ProxyApiResponse } from "@ekt-check-in/types/api";
+import { useContext, useMemo, useState } from "react";
+import { AccountContext } from "./AccountProvider";
+import { CheckInLinkModal } from "./CheckInLinkModal";
 
 function StatusBadge({ status }: { status: number }) {
   const text = ["报名中", "待开始", "进行中", "待完结", "完结审核中", "已完结"];
@@ -47,12 +49,6 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
     onClose: onCheckInClose,
   } = useDisclosure();
 
-  const {
-    isOpen: isRegisterOpen,
-    onOpen: onRegisterOpen,
-    onClose: onRegisterClose,
-  } = useDisclosure();
-
   const isWrongId = useMemo(() => {
     return !/^\d+$/.test(activityData.id);
   }, [activityData.id]);
@@ -63,6 +59,49 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
     }
     return true;
   }, [activityData.maxRegNum, activityData.regNum]);
+
+  const { id, password } = useContext(AccountContext);
+
+  const toast = useToast();
+
+  async function handleRegister() {
+    const loading = toast({
+      description: "请求中",
+      status: "loading",
+    });
+
+    const url = new URL(`${webConfig.proxyApi}/register-activity`);
+    url.searchParams.set("id", id);
+    url.searchParams.set("password", password);
+    url.searchParams.set("activityId", activityData.id);
+
+    try {
+      const res = await fetch(url);
+      const data: ProxyApiResponse<null> = await res.json();
+
+      toast.close(loading);
+
+      if (res.status !== 200) {
+        toast({
+          description: data.msg,
+          status: "error",
+        });
+        return;
+      }
+
+      toast({
+        description: "报名成功",
+        status: "success",
+      });
+    } catch (error) {
+      toast.close(loading);
+
+      toast({
+        description: "请求报名时出现错误",
+        status: "error",
+      });
+    }
+  }
 
   return (
     <>
@@ -117,19 +156,20 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
             <Button
               size="sm"
               colorScheme="teal"
-              onClick={onCheckInOpen}
-              isDisabled={isWrongId}
+              variant="outline"
+              onClick={handleRegister}
+              isDisabled={isWrongId || !isRegistrable || !id || !password}
             >
-              签到
+              报名
             </Button>
             <Button
               size="sm"
               colorScheme="teal"
               variant="outline"
-              onClick={onRegisterOpen}
-              isDisabled={isWrongId || !isRegistrable}
+              onClick={onCheckInOpen}
+              isDisabled={isWrongId}
             >
-              帮我报名
+              签到链接
             </Button>
             <Button
               size="sm"
@@ -142,16 +182,10 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
         </CardBody>
       </Card>
 
-      <CheckInModal
+      <CheckInLinkModal
         activityData={activityData}
         isOpen={isCheckInOpen}
         onClose={onCheckInClose}
-      />
-
-      <RegisterModal
-        activityData={activityData}
-        isOpen={isRegisterOpen}
-        onClose={onRegisterClose}
       />
     </>
   );
