@@ -64,3 +64,33 @@ export interface EktActivityRow {
   isDelete: unknown;
   isSign: string;
 }
+
+export interface EktMyActivityRow {
+  createTime: string;
+  createUser: string;
+  updateTime: string;
+  updateUser: string;
+  id: string;
+  activityId: string;
+  studentId: string;
+  roleName: string;
+  studentName: string;
+  studentCode: string;
+  collegeName: string;
+  collegeId: string;
+  activitySignTime: string;
+  activitySignStatus: string;
+  signDisagreeReason: string | null;
+  activitySignDes: string | null;
+  signInTime: string | null;
+  signOutTime: string | null;
+  duration: unknown;
+  leaveSituation: unknown;
+  leaveTime: string | null;
+  leaveResult: string;
+  leaveDisagreeReason: string | null;
+  integral: number;
+  assumeRole: unknown;
+  task: unknown;
+  isDelete: unknown;
+}

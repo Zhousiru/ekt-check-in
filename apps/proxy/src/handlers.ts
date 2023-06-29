@@ -1,8 +1,13 @@
-import { Activity, ProxyApiResponse } from "@ekt-check-in/types/api";
+import {
+  Activity,
+  MyActivity,
+  ProxyApiResponse,
+} from "@ekt-check-in/types/api";
 import {
   EktActivityData,
   EktActivityRow,
   EktApiResponse,
+  EktMyActivityRow,
   EktRegisterActivityData,
 } from "@ekt-check-in/types/ekt";
 import { Request, Response } from "express";
@@ -20,7 +25,6 @@ export async function handleRequestActivities(req: Request, res: Response) {
     >((resolve, reject) => {
       worker.emit(
         "requestActivities",
-        50,
         (
           response: EktApiResponse<EktActivityData<EktActivityRow>> | null,
           err?: string
@@ -107,6 +111,94 @@ export async function handleRegisterActivity(req: Request, res: Response) {
     const r: ProxyApiResponse<null> = {
       payload: null,
       msg: `successfully registered: ${apiRes.data.msg}`,
+    };
+    res.status(200).json(r);
+  } catch (err) {
+    responseWithWorkerError(res, err);
+    return;
+  }
+}
+
+export async function handleRequestMyActivities(req: Request, res: Response) {
+  const worker = await getWorkerWithResponse(res);
+  if (!worker) {
+    return;
+  }
+
+  const { id, password } = req.query;
+
+  try {
+    const apiRes = await new Promise<
+      EktApiResponse<EktActivityData<EktMyActivityRow>>
+    >((resolve, reject) => {
+      worker.emit(
+        "requestMyActivities",
+        <string>id,
+        <string>password,
+        (
+          response: EktApiResponse<EktActivityData<EktMyActivityRow>> | null,
+          err?: string
+        ) => {
+          if (err || !response) {
+            reject(err);
+            return;
+          }
+          resolve(response);
+        }
+      );
+    });
+
+    const activities = apiRes.data.rows.map((row): MyActivity => {
+      return {
+        activityId: row.activityId,
+        isCheckIn: Boolean(row.signInTime),
+        isCheckOut: Boolean(row.signOutTime),
+      };
+    });
+
+    const r: ProxyApiResponse<MyActivity[]> = {
+      payload: activities,
+      msg: "",
+    };
+    res.status(200).json(r);
+  } catch (err) {
+    responseWithWorkerError(res, err);
+    return;
+  }
+}
+
+export async function handleEditCheckInDate(req: Request, res: Response) {
+  const worker = await getWorkerWithResponse(res);
+  if (!worker) {
+    return;
+  }
+
+  const { id, password, activityId, checkInDate, checkOutDate } = req.query;
+
+  try {
+    const apiRes = await new Promise<EktApiResponse<null>>(
+      (resolve, reject) => {
+        worker.emit(
+          "editCheckInDate",
+          <string>id,
+          <string>password,
+          <string>activityId,
+          <string>checkInDate,
+          <string>checkOutDate,
+          (response: EktApiResponse<null> | null, err?: string) => {
+            if (err || !response) {
+              reject(err);
+              return;
+            }
+            resolve(response);
+          }
+        );
+      }
+    );
+
+    const r: ProxyApiResponse<null> = {
+      payload: null,
+      msg: `successfully edited: ${apiRes.message}`,
     };
     res.status(200).json(r);
   } catch (err) {

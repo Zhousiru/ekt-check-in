@@ -18,3 +18,9 @@ export interface Activity {
   maxRegNum: number | null;
   status: number;
 }
+
+export interface MyActivity {
+  activityId: string;
+  isCheckIn: boolean;
+  isCheckOut: boolean;
+}

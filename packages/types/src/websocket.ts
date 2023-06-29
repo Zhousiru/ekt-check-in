@@ -2,17 +2,16 @@ import {
   EktActivityData,
   EktActivityRow,
   EktApiResponse,
+  EktMyActivityRow,
   EktRegisterActivityData,
 } from "./ekt";
 
 export interface ServerToClientEvents {
   requestActivities: (
-    pageSize: number,
     callback: (
       response: EktApiResponse<EktActivityData<EktActivityRow>> | null,
       err?: string
-    ) => void,
-    pageNo?: number
+    ) => void
   ) => void;
   registerActivity: (
     id: string,
@@ -22,6 +21,22 @@ export interface ServerToClientEvents {
       response: EktApiResponse<EktRegisterActivityData> | null,
       err?: string
     ) => void
+  ) => void;
+  requestMyActivities: (
+    id: string,
+    password: string,
+    callback: (
+      response: EktApiResponse<EktActivityData<EktMyActivityRow>> | null,
+      err?: string
+    ) => void
+  ) => void;
+  editCheckInDate: (
+    id: string,
+    password: string,
+    activityId: string,
+    checkInDate: string,
+    checkOutDate: string,
+    callback: (response: EktApiResponse<null> | null, err?: string) => void
   ) => void;
 }
 
