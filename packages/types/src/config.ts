@@ -7,6 +7,7 @@ export interface Config {
   worker: {
     proxyAddress: string;
     socksProxyUrl?: string;
+    defaultPageSize: number;
     idGenerator: () => string;
   };
 }

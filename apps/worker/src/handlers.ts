@@ -1,3 +1,4 @@
+import { config } from "@ekt-check-in/config";
 import {
   EktActivityData,
   EktActivityRow,
@@ -42,7 +43,7 @@ const handleRequestActivities: ServerToClientEvents["requestActivities"] =
       EktApiResponse<EktActivityData<EktActivityRow>>
     >("http://ekt.cuit.edu.cn/api/activityInfo/page", {
       params: {
-        pageSize: 50,
+        pageSize: config.worker.defaultPageSize,
       },
       headers: { Authorization: `Bearer ${apiToken}` },
     });
@@ -102,7 +103,7 @@ const handleRequestMyActivities: ServerToClientEvents["requestMyActivities"] =
         EktApiResponse<EktActivityData<EktMyActivityRow>>
       >("http://ekt.cuit.edu.cn/api/activityInfoSign/my", {
         params: {
-          pageSize: 50,
+          pageSize: config.worker.defaultPageSize,
         },
         headers: {
           Authorization: `Bearer ${apiToken}`,
