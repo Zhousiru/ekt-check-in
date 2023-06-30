@@ -1,7 +1,20 @@
-import { Card, CardBody, Code, Spinner, Text } from "@chakra-ui/react";
+import {
+  Card,
+  CardBody,
+  Code,
+  Spinner,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { webConfig } from "@ekt-check-in/config";
-import { Activity, ProxyApiResponse } from "@ekt-check-in/types/api";
+import {
+  Activity,
+  MyActivity,
+  ProxyApiResponse,
+} from "@ekt-check-in/types/api";
+import { useCallback, useContext, useEffect, useState } from "react";
 import useSWR from "swr";
+import { AccountContext } from "./AccountProvider";
 import { ActivityCard } from "./ActivityCard";
 
 function ErrorCard({ data }: { data?: ProxyApiResponse<Activity[]> }) {
@@ -22,9 +35,51 @@ function ErrorCard({ data }: { data?: ProxyApiResponse<Activity[]> }) {
 }
 
 export function ActivityList() {
+  const toast = useToast();
+
+  const { id, password } = useContext(AccountContext);
+  const [myActivityData, setMyActivityData] = useState<MyActivity[]>([]);
+
+  const refeshMyActivity = useCallback(async () => {
+    const myActivityUrl = new URL(
+      `${webConfig.proxyApi}/request-my-activities`
+    );
+    myActivityUrl.searchParams.set("id", id);
+    myActivityUrl.searchParams.set("password", password);
+
+    try {
+      const res = await fetch(myActivityUrl);
+      const data: ProxyApiResponse<MyActivity[]> = await res.json();
+
+      if (res.status !== 200) {
+        toast({
+          description: data.msg,
+          status: "error",
+        });
+        return;
+      }
+
+      setMyActivityData(data.payload);
+    } catch (error) {
+      console.error(error);
+      toast({
+        description: "请求个人活动时出现错误",
+        status: "error",
+      });
+    }
+  }, [id, password, toast]);
+
+  useEffect(() => {
+    if (id && password) {
+      refeshMyActivity();
+    }
+  }, [id, password, refeshMyActivity]);
+
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
   const { data, error, isLoading } = useSWR<ProxyApiResponse<Activity[]>>(
     `${webConfig.proxyApi}/request-activities`,
-    (url) => fetch(url).then((res) => res.json())
+    fetcher
   );
 
   if (error) return <ErrorCard />;
@@ -52,6 +107,9 @@ export function ActivityList() {
       {data.payload.map((activity) => (
         <ActivityCard
           activityData={activity}
+          myActivityData={myActivityData.find(
+            (el) => el.activityId === activity.id
+          )}
           key={activity.id + activity.name}
         />
       ))}

@@ -17,7 +17,11 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { webConfig } from "@ekt-check-in/config";
-import { Activity, ProxyApiResponse } from "@ekt-check-in/types/api";
+import {
+  Activity,
+  MyActivity,
+  ProxyApiResponse,
+} from "@ekt-check-in/types/api";
 import { useContext, useMemo, useState } from "react";
 import { AccountContext } from "./AccountProvider";
 import { CheckInLinkModal } from "./CheckInLinkModal";
@@ -40,7 +44,13 @@ function StatusBadge({ status }: { status: number }) {
   return <Badge colorScheme="blue">{text[status]}</Badge>;
 }
 
-export function ActivityCard({ activityData }: { activityData: Activity }) {
+export function ActivityCard({
+  activityData,
+  myActivityData,
+}: {
+  activityData: Activity;
+  myActivityData?: MyActivity;
+}) {
   const [showDesc, setShowDesc] = useState<boolean>(false);
 
   const {
@@ -54,11 +64,15 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
   }, [activityData.id]);
 
   const isRegistrable = useMemo(() => {
+    if (myActivityData) {
+      return false;
+    }
+
     if (activityData.maxRegNum) {
       return activityData.regNum < activityData.maxRegNum;
     }
     return true;
-  }, [activityData.maxRegNum, activityData.regNum]);
+  }, [activityData.maxRegNum, activityData.regNum, myActivityData]);
 
   const { id, password } = useContext(AccountContext);
 
@@ -151,6 +165,24 @@ export function ActivityCard({ activityData }: { activityData: Activity }) {
               此活动功能不可用，因为第二课堂 API 返回的 ID 有误
             </Alert>
           )}
+
+          {myActivityData &&
+            (myActivityData.isCheckIn && myActivityData.isCheckOut ? (
+              <Alert status="success" mb={5}>
+                <AlertIcon />
+                你已经报名此活动，并成功签到和签退
+              </Alert>
+            ) : (
+              <Alert status="info" mb={5}>
+                <AlertIcon />
+                你已经报名此活动，但没有
+                {!myActivityData.isCheckIn && !myActivityData.isCheckOut
+                  ? "签到和签退"
+                  : !myActivityData.isCheckIn
+                  ? "签到"
+                  : "签退"}
+              </Alert>
+            ))}
 
           <Flex gap={2}>
             <Button
