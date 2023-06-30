@@ -47,9 +47,11 @@ function StatusBadge({ status }: { status: number }) {
 export function ActivityCard({
   activityData,
   myActivityData,
+  handleRefresh,
 }: {
   activityData: Activity;
   myActivityData?: MyActivity;
+  handleRefresh: () => void;
 }) {
   const [showDesc, setShowDesc] = useState<boolean>(false);
 
@@ -107,6 +109,7 @@ export function ActivityCard({
         description: "报名成功",
         status: "success",
       });
+      handleRefresh();
     } catch (error) {
       toast.close(loading);
 

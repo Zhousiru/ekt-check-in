@@ -1,6 +1,7 @@
 import {
   Alert,
   AlertIcon,
+  Box,
   Button,
   Card,
   CardBody,
@@ -15,13 +16,14 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Text,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { useContext, useLayoutEffect, useState } from "react";
 import { AccountContext } from "./AccountProvider";
 
-export function SettingCard() {
+export function SettingCard({ handleRefresh }: { handleRefresh: () => void }) {
   const [needSetup, setNeedSetup] = useState(false);
   const { id, setId, password, setPassword } = useContext(AccountContext);
   const [tempId, setTempId] = useState(id);
@@ -63,7 +65,7 @@ export function SettingCard() {
 
   return (
     <>
-      <Card bg={needSetup ? "orange.100" : "blue.100"}>
+      <Card bg={needSetup ? "orange.100" : "white"}>
         <CardBody display="flex" alignItems="center">
           {needSetup ? (
             <Alert status="warning">
@@ -71,19 +73,26 @@ export function SettingCard() {
               你还没有设置第二课堂账户，因此部分功能不可用
             </Alert>
           ) : (
-            <Alert status="info">
-              <AlertIcon />
-              当前账户：{id}
-            </Alert>
+            <Text>当前账户：{id}</Text>
           )}
 
-          <Button
-            colorScheme={needSetup ? "orange" : "blue"}
-            variant={needSetup ? "solid" : "outline"}
-            onClick={onOpen}
-          >
-            设置
-          </Button>
+          <Box ml="auto" display="flex" gap={2}>
+            <Button
+              colorScheme={needSetup ? "orange" : "gray"}
+              onClick={onOpen}
+            >
+              设置
+            </Button>
+            {!needSetup && (
+              <Button
+                colorScheme="gray"
+                variant="outline"
+                onClick={handleRefresh}
+              >
+                刷新我的活动
+              </Button>
+            )}
+          </Box>
         </CardBody>
       </Card>
 

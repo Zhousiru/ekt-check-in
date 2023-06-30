@@ -12,10 +12,21 @@ import {
   MyActivity,
   ProxyApiResponse,
 } from "@ekt-check-in/types/api";
-import { useCallback, useContext, useEffect, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import useSWR from "swr";
 import { AccountContext } from "./AccountProvider";
 import { ActivityCard } from "./ActivityCard";
+
+export interface ActivityListRef {
+  refeshMyActivity: () => void;
+}
 
 function ErrorCard({ data }: { data?: ProxyApiResponse<Activity[]> }) {
   return (
@@ -34,7 +45,7 @@ function ErrorCard({ data }: { data?: ProxyApiResponse<Activity[]> }) {
   );
 }
 
-export function ActivityList() {
+export const ActivityList = forwardRef<ActivityListRef>((_, ref) => {
   const toast = useToast();
 
   const { id, password } = useContext(AccountContext);
@@ -68,6 +79,16 @@ export function ActivityList() {
       });
     }
   }, [id, password, toast]);
+
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        refeshMyActivity,
+      };
+    },
+    [refeshMyActivity]
+  );
 
   useEffect(() => {
     if (id && password) {
@@ -106,6 +127,7 @@ export function ActivityList() {
     <>
       {data.payload.map((activity) => (
         <ActivityCard
+          handleRefresh={refeshMyActivity}
           activityData={activity}
           myActivityData={myActivityData.find(
             (el) => el.activityId === activity.id
@@ -115,4 +137,4 @@ export function ActivityList() {
       ))}
     </>
   );
-}
+});

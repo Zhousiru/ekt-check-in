@@ -1,9 +1,16 @@
 import { Card, CardBody, Container, Heading } from "@chakra-ui/react";
+import { useRef } from "react";
 import { AccountProvider } from "./components/AccountProvider";
-import { ActivityList } from "./components/ActivityList";
+import { ActivityList, ActivityListRef } from "./components/ActivityList";
 import { SettingCard } from "./components/SettingCard";
 
 function App() {
+  const activityListRef = useRef<ActivityListRef>(null);
+
+  function handleRefreshMyActivity() {
+    activityListRef.current?.refeshMyActivity();
+  }
+
   return (
     <>
       <Container
@@ -22,8 +29,8 @@ function App() {
         </Card>
 
         <AccountProvider>
-          <SettingCard />
-          <ActivityList />
+          <SettingCard handleRefresh={handleRefreshMyActivity} />
+          <ActivityList ref={activityListRef} />
         </AccountProvider>
       </Container>
     </>
