@@ -23,7 +23,11 @@ import {
 import { useContext, useLayoutEffect, useState } from "react";
 import { AccountContext } from "./AccountProvider";
 
-export function SettingCard({ handleRefresh }: { handleRefresh: () => void }) {
+export function SettingCard({
+  handleRefresh,
+}: {
+  handleRefresh: () => Promise<void>;
+}) {
   const [needSetup, setNeedSetup] = useState(false);
   const { id, setId, password, setPassword } = useContext(AccountContext);
   const [tempId, setTempId] = useState(id);
@@ -41,6 +45,19 @@ export function SettingCard({ handleRefresh }: { handleRefresh: () => void }) {
   };
 
   useLayoutEffect(updateStatus, [id, password]);
+
+  async function handleRefreshWithToast() {
+    const loading = toast({
+      description: "请求刷新个人活动中",
+      status: "loading",
+    });
+
+    try {
+      await handleRefresh();
+    } finally {
+      toast.close(loading);
+    }
+  }
 
   function handleClose() {
     setTempId(id);
@@ -87,7 +104,7 @@ export function SettingCard({ handleRefresh }: { handleRefresh: () => void }) {
               <Button
                 colorScheme="gray"
                 variant="outline"
-                onClick={handleRefresh}
+                onClick={handleRefreshWithToast}
               >
                 刷新我的活动
               </Button>

@@ -8,7 +8,10 @@ function App() {
   const activityListRef = useRef<ActivityListRef>(null);
 
   function handleRefreshMyActivity() {
-    activityListRef.current?.refeshMyActivity();
+    if (!activityListRef.current) {
+      return Promise.resolve();
+    }
+    return activityListRef.current.refeshMyActivity();
   }
 
   return (

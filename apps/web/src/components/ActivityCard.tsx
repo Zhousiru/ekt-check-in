@@ -25,6 +25,7 @@ import {
 import { useContext, useMemo, useState } from "react";
 import { AccountContext } from "./AccountProvider";
 import { CheckInLinkModal } from "./CheckInLinkModal";
+import { CheckInModal } from "./CheckInModal";
 
 function StatusBadge({ status }: { status: number }) {
   const text = ["报名中", "待开始", "进行中", "待完结", "完结审核中", "已完结"];
@@ -61,6 +62,12 @@ export function ActivityCard({
     onClose: onCheckInClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isCheckInLinkOpen,
+    onOpen: onCheckInLinkOpen,
+    onClose: onCheckInLinkClose,
+  } = useDisclosure();
+
   const isWrongId = useMemo(() => {
     return !/^\d+$/.test(activityData.id);
   }, [activityData.id]);
@@ -77,8 +84,14 @@ export function ActivityCard({
   }, [activityData.maxRegNum, activityData.regNum, myActivityData]);
 
   const { id, password } = useContext(AccountContext);
-
   const toast = useToast();
+
+  const withRefresh = async (fn: () => Promise<void> | void) => {
+    await fn();
+    if (id && password) {
+      handleRefresh();
+    }
+  };
 
   async function handleRegister() {
     const loading = toast({
@@ -109,7 +122,6 @@ export function ActivityCard({
         description: "报名成功",
         status: "success",
       });
-      handleRefresh();
     } catch (error) {
       toast.close(loading);
 
@@ -191,8 +203,7 @@ export function ActivityCard({
             <Button
               size="sm"
               colorScheme="teal"
-              variant="outline"
-              onClick={handleRegister}
+              onClick={() => withRefresh(handleRegister)}
               isDisabled={isWrongId || !isRegistrable || !id || !password}
             >
               报名
@@ -200,8 +211,23 @@ export function ActivityCard({
             <Button
               size="sm"
               colorScheme="teal"
-              variant="outline"
+              variant={
+                myActivityData?.isCheckIn && myActivityData?.isCheckOut
+                  ? "outline"
+                  : "solid"
+              }
               onClick={onCheckInOpen}
+              isDisabled={isWrongId || !myActivityData || !id || !password}
+            >
+              {myActivityData?.isCheckIn && myActivityData?.isCheckOut
+                ? "修改签到"
+                : "签到"}
+            </Button>
+            <Button
+              size="sm"
+              colorScheme="teal"
+              variant="outline"
+              onClick={onCheckInLinkOpen}
               isDisabled={isWrongId}
             >
               签到链接
@@ -217,10 +243,16 @@ export function ActivityCard({
         </CardBody>
       </Card>
 
+      <CheckInModal
+        activityData={activityData}
+        myActivityData={myActivityData}
+        isOpen={isCheckInOpen}
+        onClose={() => withRefresh(onCheckInClose)}
+      />
       <CheckInLinkModal
         activityData={activityData}
-        isOpen={isCheckInOpen}
-        onClose={onCheckInClose}
+        isOpen={isCheckInLinkOpen}
+        onClose={() => withRefresh(onCheckInLinkClose)}
       />
     </>
   );

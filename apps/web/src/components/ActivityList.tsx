@@ -25,7 +25,7 @@ import { AccountContext } from "./AccountProvider";
 import { ActivityCard } from "./ActivityCard";
 
 export interface ActivityListRef {
-  refeshMyActivity: () => void;
+  refeshMyActivity: () => Promise<void>;
 }
 
 function ErrorCard({ data }: { data?: ProxyApiResponse<Activity[]> }) {
@@ -72,7 +72,6 @@ export const ActivityList = forwardRef<ActivityListRef>((_, ref) => {
 
       setMyActivityData(data.payload);
     } catch (error) {
-      console.error(error);
       toast({
         description: "请求个人活动时出现错误",
         status: "error",
