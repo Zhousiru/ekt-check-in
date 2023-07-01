@@ -1,6 +1,7 @@
 import { config } from "@ekt-check-in/config";
 import cors from "cors";
 import express from "express";
+import morgan from "morgan";
 import {
   handleEditCheckInDate,
   handleRegisterActivity,
@@ -10,7 +11,12 @@ import {
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors(),
+  morgan(
+    `Request: :date[clf] | :remote-addr | :method ":url" | :status | :response-time ms`
+  )
+);
 
 app.get("/request-activities", handleRequestActivities);
 app.get("/register-activity", handleRegisterActivity);
