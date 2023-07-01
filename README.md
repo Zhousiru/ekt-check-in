@@ -2,9 +2,6 @@
 
 CUIT 第二课堂助手网站
 
-> **Warning**
-> Work in Progress
-
 ## 引言
 
 ### 提示
