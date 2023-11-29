@@ -35,7 +35,7 @@ CUIT 第二课堂助手网站
 
 ## 第二课堂 API
 
-`ekty.cuit.edu.cn` 目前需要在实验室网络下访问，宿舍网络似乎会 502
+`ekty.cuit.edu.cn` 目前需要在校园内网下访问
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/8280409-4f278737-3f48-4fe4-abb8-f10d6526c2fa?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D8280409-4f278737-3f48-4fe4-abb8-f10d6526c2fa%26entityType%3Dcollection%26workspaceId%3D9475b716-cc00-4b2c-a157-84c2982631a4)
 
